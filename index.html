@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>测一测，TA 是不是也在偷偷喜欢你</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23f2708a' d='M12 21s-7.5-4.9-10-9.2C.4 8.6 2.2 5 5.6 5c2 0 3.4 1.1 4.4 2.6C11 6.1 12.4 5 14.4 5c3.4 0 5.2 3.6 3.6 6.8C19.5 16.1 12 21 12 21z'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#fff5f1;
+    --card:#ffffff;
+    --ink:#3d2b2b;
+    --sub:#8a7272;
+    --pink:#f2708a;
+    --pink-soft:#ffe3ea;
+    --coral:#ff8f6b;
+    --line:#f6ddd6;
+    --shadow:0 10px 30px rgba(242,112,138,.14);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+  }
+  .wrap{max-width:480px;margin:0 auto;min-height:100%;padding:0 20px;}
+  .view{display:none;min-height:100vh;flex-direction:column;}
+  .view.active{display:flex;}
+
+  /* ===== 首页 ===== */
+  #home{padding:48px 0 32px;justify-content:center;}
+  .home-badge{
+    align-self:center;font-size:13px;color:var(--pink);background:var(--pink-soft);
+    padding:6px 14px;border-radius:999px;letter-spacing:.05em;margin-bottom:22px;
+  }
+  .home-title{font-size:30px;font-weight:800;line-height:1.35;text-align:center;letter-spacing:.02em;}
+  .home-title em{font-style:normal;color:var(--pink);}
+  .home-sub{margin-top:14px;text-align:center;color:var(--sub);font-size:15px;}
+  .tags{margin-top:28px;display:flex;flex-direction:column;gap:12px;}
+  .tag{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);
+  }
+  .tag .check{
+    width:22px;height:22px;flex:0 0 22px;border-radius:50%;background:var(--pink-soft);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .tag .check svg{width:13px;height:13px;}
+  .tag .t-main{font-weight:700;font-size:15px;}
+  .tag .t-sub{color:var(--sub);font-size:13px;}
+  .cta{
+    margin-top:32px;width:100%;border:none;cursor:pointer;
+    background:linear-gradient(135deg,var(--pink),var(--coral));color:#fff;
+    font-size:17px;font-weight:700;letter-spacing:.05em;padding:17px;border-radius:999px;
+    box-shadow:0 12px 24px rgba(242,112,138,.32);
+  }
+  .home-note{margin-top:18px;text-align:center;font-size:12px;color:var(--sub);}
+
+  /* ===== 答题页 ===== */
+  #quiz{padding:28px 0 32px;}
+  .progress-row{display:flex;align-items:center;gap:12px;margin-bottom:22px;}
+  .progress-num{font-size:14px;color:var(--pink);font-weight:700;white-space:nowrap;}
+  .progress-bar{flex:1;height:8px;background:var(--pink-soft);border-radius:999px;overflow:hidden;}
+  .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--coral));border-radius:999px;transition:width .3s;}
+  .q-card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:24px 20px;box-shadow:var(--shadow);}
+  .q-index{font-size:13px;color:var(--sub);margin-bottom:10px;}
+  .q-title{font-size:19px;font-weight:800;line-height:1.5;margin-bottom:22px;}
+  .options{display:flex;flex-direction:column;gap:13px;}
+  .opt{
+    border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:15px 16px;
+    font-size:15px;color:var(--ink);text-align:left;cursor:pointer;line-height:1.55;
+    transition:border-color .15s,background .15s;
+  }
+  .opt:active{background:var(--pink-soft);border-color:var(--pink);}
+  .opt .letter{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--pink-soft);color:var(--pink);font-weight:700;font-size:13px;align-items:center;justify-content:center;margin-right:9px;vertical-align:1px;}
+
+  /* ===== 结果页 ===== */
+  #result{padding:36px 0 32px;justify-content:center;}
+  .res-card{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:30px 22px;box-shadow:var(--shadow);text-align:center;}
+  .res-kicker{font-size:13px;color:var(--sub);letter-spacing:.08em;margin-bottom:12px;}
+  .res-emoji{font-size:40px;margin-bottom:6px;}
+  .res-name{font-size:24px;font-weight:800;color:var(--pink);margin-bottom:8px;}
+  .res-slogan{font-size:15px;color:var(--coral);font-weight:700;margin-bottom:20px;}
+  .res-desc{font-size:15px;color:var(--ink);text-align:left;background:var(--bg);border-radius:16px;padding:18px;line-height:1.75;}
+  .res-tagline{margin-top:18px;font-size:12px;color:var(--sub);}
+  .again{margin-top:24px;width:100%;border:1.5px solid var(--pink);background:#fff;color:var(--pink);font-size:16px;font-weight:700;padding:15px;border-radius:999px;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== 视图：首页 ===== -->
+  <section class="view active" id="home">
+    <div class="home-badge">心动细节小测试</div>
+    <h1 class="home-title">测一测，<br>TA 是不是也在<em>偷偷喜欢你</em></h1>
+    <p class="home-sub">凭你的心动细节，匹配 TA 的真实心意</p>
+    <div class="tags">
+      <div class="tag">
+        <span class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#f2708a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span><span class="t-main">心动细节</span>　<span class="t-sub">每个举动都有答案</span></span>
+      </div>
+      <div class="tag">
+        <span class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#f2708a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span><span class="t-main">聊天温度</span>　<span class="t-sub">回复速度藏着态度</span></span>
+      </div>
+      <div class="tag">
+        <span class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#f2708a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span><span class="t-main">暧昧浓度</span>　<span class="t-sub">你们现在到哪一步</span></span>
+      </div>
+      <div class="tag">
+        <span class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#f2708a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span><span class="t-main">心意解读</span>　<span class="t-sub">TA 心里到底怎么看你</span></span>
+      </div>
+    </div>
+    <button class="cta" onclick="startQuiz()">点击测试 →</button>
+    <p class="home-note">趣味测试仅供娱乐，别拿结果去质问他</p>
+  </section>
+
+  <!-- ===== 视图：答题 ===== -->
+  <section class="view" id="quiz">
+    <div class="progress-row">
+      <span class="progress-num" id="progressNum">1 / 24</span>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <div class="q-card">
+      <div class="q-index" id="qIndex"></div>
+      <div class="q-title" id="qTitle"></div>
+      <div class="options" id="options"></div>
+    </div>
+  </section>
+
+  <!-- ===== 视图：结果 ===== -->
+  <section class="view" id="result">
+    <div class="res-card">
+      <div class="res-kicker">你的测试结果是</div>
+      <div class="res-emoji" id="resEmoji">💗</div>
+      <div class="res-name" id="resName"></div>
+      <div class="res-slogan" id="resSlogan"></div>
+      <div class="res-desc" id="resDesc"></div>
+      <button class="again" onclick="restart()">再测一次</button>
+      <div class="res-tagline">趣味测试仅供娱乐，开心就好</div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+// ===== 结果池：1=双向奔赴 … 10=时机未到 =====
+var RESULTS = {
+  1:{emoji:"💞",name:"双向奔赴型",slogan:"你俩就差一个人先开口",desc:"TA 主动找话题、记得你随口说的小事，见面眼睛发亮又有点拘谨。两个人都在等对方先捅破窗户纸，谁先开口谁就赢了，下一步随便挑个周末约个饭就成。"},
+  2:{emoji:"🫣",name:"偷偷暗恋型",slogan:"TA 也喜欢你，只是不敢说",desc:"表面云淡风轻，实际把你的朋友圈翻到底、点赞比谁都快。TA 在你面前容易嘴硬、容易害羞、容易假装不在意，属于心里默念一百遍、对话框里只敢发个表情。"},
+  3:{emoji:"🍡",name:"友达以上型",slogan:"再靠近一点就变味了",desc:"日常相处比普通朋友亲密，会单独约、会接你下班、会跟你分享私事，但谁都没把那层纸说破。氛围刚刚好，再往前一步就是恋爱，停在原地也甜得让人着急。"},
+  4:{emoji:"🐢",name:"慢热观望型",slogan:"有感觉，但还在观察你",desc:"TA 不排斥、不冷淡，偶尔主动、偶尔收着，像是在慢慢收集你的好感证据。节奏偏慢，需要更多相处细节来确认自己的心意，别急着催答案。"},
+  5:{emoji:"😤",name:"故作镇定型",slogan:"嘴上说没有，身体很诚实",desc:"嘴上一口一个“朋友而已”“想多了”，行动上却随叫随到、记得细节、眼神黏着你。典型的口嫌体正直，越否认越说明有点上头，看破别点破最好玩。"},
+  6:{emoji:"🧃",name:"纯友谊型",slogan:"TA 真的只把你当朋友",desc:"相处轻松大方，不躲你也不绕弯，跟你聊天像跟好兄弟、好闺蜜唠嗑，没有多余的暧昧试探。这份关系很稳很舒服，只是心动这件事，目前真不在 TA 的选项里。"},
+  7:{emoji:"🪢",name:"暧昧拉扯型",slogan:"享受这个过程，就是不表态",desc:"时而热情时而退后，甜话会说、距离会拉，聊天氛围很上头，但一到确认关系就绕道走。TA 喜欢这种被喜欢的感觉，至于要不要落地，眼下还没打算。"},
+  8:{emoji:"🙂",name:"礼貌友好型",slogan:"TA 对谁都这样，别多想",desc:"回消息客气周到，帮忙也爽快，但这份热乎劲儿是 TA 的社交习惯，对谁都一个模板。人是好人，友好是礼貌，未必是心动，别把礼貌记成专属信号。"},
+  9:{emoji:"📡",name:"信号错位型",slogan:"你的心动，TA 根本没接收到",desc:"你这边已经脑补完一整集剧情，TA 那边全程没上线。你以为的暗示和铺垫，在 TA 眼里就是普通聊天、顺手帮忙、正常朋友互动，频道没对上，信号发出去了但没人接收。"},
+  10:{emoji:"⏳",name:"时机未到型",slogan:"有戏，但眼下不是时候",desc:"TA 对你不反感甚至有点欣赏，性格也合得来，只是当下有别的事要忙（工作、状态、个人节奏），暂时腾不出位置给恋爱。人没问题，时间差了一点，不急也别硬冲。"}
+};
+
+// ===== 24 道题：选项 tag 对应结果编号 =====
+var QUESTIONS = [
+  {q:"TA 凌晨两点回你消息，通常是什么节奏？",o:[
+    {t:"几乎秒回，还会接着跟你聊下去，困了才收尾",tag:1},
+    {t:"隔一阵才回，回完又解释刚才在干嘛，生怕你多想",tag:2},
+    {t:"第二天一早才回，补一句“昨晚睡太早”",tag:4},
+    {t:"看到就回，客气客气，聊两句就结束话题",tag:8}
+  ]},
+  {q:"翻你们的聊天记录，谁更常先结束对话？",o:[
+    {t:"总是 TA 舍不得挂，话题绕一圈又绕回来",tag:1},
+    {t:"TA 常常硬找个事拖延结尾，就想多聊会儿",tag:2},
+    {t:"有一搭没一搭，谁有空谁收尾，不分先后",tag:6},
+    {t:"基本是 TA 主动说“先忙了”，礼貌收束",tag:8}
+  ]},
+  {q:"TA 发朋友圈，你点赞大概是什么速度？",o:[
+    {t:"刚发就看到，评论区第一个冒泡",tag:1},
+    {t:"经常刷到很晚才发现，但还是会默默点赞",tag:2},
+    {t:"偶尔点赞，偶尔也会留句玩笑评论",tag:3},
+    {t:"想起来才点，TA 发什么都赞一赞",tag:8}
+  ]},
+  {q:"TA 约你吃饭，理由通常是哪种？",o:[
+    {t:"直接说“想找你吃饭”，不绕弯子",tag:1},
+    {t:"找各种借口顺路、顺路才凑到一起",tag:2},
+    {t:"拉上一堆朋友组局，你只是其中之一",tag:6},
+    {t:"轮到 TA 请客回请，纯属人情往来",tag:8}
+  ]},
+  {q:"逢年过节，TA 给你的祝福是什么画风？",o:[
+    {t:"单独给你发一段，还会问你最近过得怎么样",tag:1},
+    {t:"文案挺用心，但发完又有点害羞撤回重发",tag:2},
+    {t:"群里统一复制粘贴，顺便带你一个",tag:6},
+    {t:"客气地群发，表情到位、内容通用",tag:8}
+  ]},
+  {q:"在共同朋友面前，TA 提到你的频率？",o:[
+    {t:"聊着聊着就把话题绕到你身上，自己都没察觉",tag:1},
+    {t:"嘴上很少提，朋友起哄时却悄悄观察你反应",tag:2},
+    {t:"常拿你开玩笑打打闹闹，气氛很熟",tag:3},
+    {t:"基本不提你，聊到你就正常接一句",tag:9}
+  ]},
+  {q:"聊天时 TA 的回复习惯更像哪种？",o:[
+    {t:"回得快、话也多，还会反问你一串问题",tag:1},
+    {t:"回复有点纠结，打了又删，怕说错话",tag:2},
+    {t:"慢悠悠回，心情好就多聊两句",tag:4},
+    {t:"不冷不热，话题全靠你在撑",tag:9}
+  ]},
+  {q:"朋友聚会时，TA 通常坐在哪儿？",o:[
+    {t:"挨着你坐，肩膀偶尔会碰到",tag:1},
+    {t:"故意坐对面，眼神却老往你这边飘",tag:2},
+    {t:"坐你旁边或对面都行，怎么舒服怎么来",tag:3},
+    {t:"坐哪儿都行，跟谁聊都一样热络",tag:8}
+  ]},
+  {q:"你发了条有点 emo 的动态，TA 会怎么做？",o:[
+    {t:"私戳你问怎么了，陪你聊到心情好起来",tag:1},
+    {t:"先点赞，犹豫半天才过来搭句话",tag:2},
+    {t:"评论区留个搞笑梗，逗你开心就算完成",tag:3},
+    {t:"刷到就看到，不会特意做什么",tag:6}
+  ]},
+  {q:"你分享一首歌或一部电影给 TA，TA 的反应？",o:[
+    {t:"真的去看了听完，回头跟你认真聊感受",tag:1},
+    {t:"嘴上说“有空看”，转头就存进自己列表",tag:2},
+    {t:"回个表情收下，聊不聊看心情",tag:4},
+    {t:"客气回“好的好的”，然后就没有然后了",tag:9}
+  ]},
+  {q:"关于你说过的小事，TA 记得程度如何？",o:[
+    {t:"连你随口提的忌口、喜好都记得",tag:1},
+    {t:"记得，但从不主动说，怕露馅",tag:2},
+    {t:"大事记得，转头就忘小事",tag:6},
+    {t:"基本靠你自己再提醒一遍",tag:9}
+  ]},
+  {q:"在群聊里，TA 会不会专门接你的话？",o:[
+    {t:"你一发言 TA 就接，别人插不进来",tag:1},
+    {t:"常常接得很妙，但群里谁都接得上来",tag:5},
+    {t:"偶尔接一句，顺着玩笑打打闹闹",tag:3},
+    {t:"轮到自己才说话，不专门找谁",tag:8}
+  ]},
+  {q:"一般是谁主动开启聊天话题？",o:[
+    {t:"互相都挺主动，今天你找明天 TA 找",tag:1},
+    {t:"表面是你主动多，其实 TA 早等你消息",tag:2},
+    {t:"TA 偶尔会冒个泡，聊几句又安静",tag:4},
+    {t:"几乎都是你发起，TA 被动应着",tag:9}
+  ]},
+  {q:"每次跟你见面，TA 的状态更像哪种？",o:[
+    {t:"收拾得比平时精致，状态明显在线",tag:2},
+    {t:"打扮挺讲究，但嘴上说“随便穿穿”",tag:5},
+    {t:"跟平时差不多，怎么自在怎么来",tag:3},
+    {t:"完全平常心，跟见普通朋友没区别",tag:6}
+  ]},
+  {q:"你找 TA 帮个忙，TA 的态度是？",o:[
+    {t:"爽快答应，还主动多帮你想一步",tag:1},
+    {t:"嘴上念叨两句“真麻烦”，身体已经动手了",tag:5},
+    {t:"能帮就帮，朋友之间顺手的事",tag:6},
+    {t:"礼貌接住，但会保持好边界",tag:8}
+  ]},
+  {q:"你们在评论区互动是什么画风？",o:[
+    {t:"一来一回能聊成小剧场，旁人都看出来了",tag:1},
+    {t:"偶尔互损，字里行间有点小心思",tag:3},
+    {t:"只在彼此动态下留客气的一两句",tag:8},
+    {t:"基本不在对方评论区出现",tag:9}
+  ]},
+  {q:"听说你不舒服或感冒了，TA 会？",o:[
+    {t:"追着问症状，叮嘱吃药，还惦记好没好",tag:1},
+    {t:"关心是关心，但只敢在聊天里说",tag:2},
+    {t:"安慰一句“多喝热水”，然后继续唠嗑",tag:6},
+    {t:"礼貌回个安慰，话题就翻过去了",tag:8}
+  ]},
+  {q:"深夜聊天通常会聊到哪一步？",o:[
+    {t:"越聊越深，聊到彼此的心事和感情观",tag:1},
+    {t:"聊得挺暧昧，临到点了谁都不肯先睡",tag:7},
+    {t:"聊些日常废话，困了就各自休息",tag:6},
+    {t:"TA 早早说要睡了，明天再聊",tag:10}
+  ]},
+  {q:"旁人起哄你们俩时，TA 的反应？",o:[
+    {t:"没否认，反而笑着看你怎么接",tag:1},
+    {t:"脸有点红，嘴上急着撇清“别瞎说”",tag:2},
+    {t:"跟着一起笑，顺势跟你打闹",tag:3},
+    {t:"坦荡摆手，说“就是普通朋友”",tag:6}
+  ]},
+  {q:"看 TA 最近的个人状态，更像哪种？",o:[
+    {t:"生活充实稳定，随时能开始一段感情",tag:1},
+    {t:"看着单身，但感觉心里藏着点什么",tag:2},
+    {t:"不急不慢，还在挑自己喜欢的类型",tag:4},
+    {t:"最近被别的事占满，根本没空想恋爱",tag:10}
+  ]},
+  {q:"你主动约 TA 出来，TA 的答应速度？",o:[
+    {t:"一口答应，还反过来跟你商量时间地点",tag:1},
+    {t:"先假装犹豫一下，最后还是来了",tag:5},
+    {t:"看当天安排，有空就来，没空就改期",tag:4},
+    {t:"经常推说忙，找理由婉拒",tag:9}
+  ]},
+  {q:"分别道别时，TA 通常怎样？",o:[
+    {t:"回头看你好几次，磨蹭一会儿才走",tag:1},
+    {t:"走两步又想起点什么跟你说两句",tag:2},
+    {t:"挥挥手就走，干脆利落",tag:6},
+    {t:"礼貌说再见，转头忙自己的事",tag:8}
+  ]},
+  {q:"TA 偶尔给你带点零食小礼物，是为什么？",o:[
+    {t:"特意记得你喜欢什么，专门给你带",tag:1},
+    {t:"带是带了，嘴上只说“顺手买的”",tag:5},
+    {t:"大家都有一份，你只是其中之一",tag:8},
+    {t:"从来没单独给你带过东西",tag:9}
+  ]},
+  {q:"综合相处下来，你们现在的氛围最接近哪句？",o:[
+    {t:"互相都懂，就差一层窗户纸",tag:1},
+    {t:"TA 藏得很深，需要再扒一扒细节",tag:2},
+    {t:"比朋友近一点，比恋人远一点",tag:3},
+    {t:"感觉在慢慢升温，只是还没到时候",tag:10}
+  ]}
+];
+
+var current = 0;
+var scores = {};
+var LETTERS = ["A","B","C","D"];
+
+function show(id){
+  document.querySelectorAll(".view").forEach(function(v){v.classList.remove("active");});
+  document.getElementById(id).classList.add("active");
+  window.scrollTo(0,0);
+}
+
+function startQuiz(){
+  current = 0;
+  scores = {};
+  show("quiz");
+  render();
+}
+
+function render(){
+  var item = QUESTIONS[current];
+  document.getElementById("progressNum").textContent = (current+1) + " / " + QUESTIONS.length;
+  document.getElementById("progressFill").style.width = ((current)/QUESTIONS.length*100) + "%";
+  document.getElementById("qIndex").textContent = "第 " + (current+1) + " 题";
+  document.getElementById("qTitle").textContent = item.q;
+  var box = document.getElementById("options");
+  box.innerHTML = "";
+  item.o.forEach(function(opt,i){
+    var btn = document.createElement("button");
+    btn.className = "opt";
+    btn.innerHTML = '<span class="letter">'+LETTERS[i]+'</span>'+opt.t;
+    btn.onclick = function(){ choose(opt.tag); };
+    box.appendChild(btn);
+  });
+}
+
+function choose(tag){
+  scores[tag] = (scores[tag]||0) + 1;
+  current++;
+  if(current >= QUESTIONS.length){
+    finish();
+  } else {
+    render();
+  }
+}
+
+function finish(){
+  var best = 1, bestScore = -1;
+  // 按结果编号顺序遍历，平票时先出现的结果优先
+  Object.keys(RESULTS).forEach(function(k){
+    var s = scores[k]||0;
+    if(s > bestScore){ bestScore = s; best = +k; }
+  });
+  var r = RESULTS[best];
+  document.getElementById("resEmoji").textContent = r.emoji;
+  document.getElementById("resName").textContent = r.name;
+  document.getElementById("resSlogan").textContent = r.slogan;
+  document.getElementById("resDesc").textContent = r.desc;
+  show("result");
+}
+
+function restart(){ show("home"); }
+</script>
+</body>
+</html>
